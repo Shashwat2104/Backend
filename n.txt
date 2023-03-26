@@ -1,0 +1,39 @@
+userRoute.post("/register", (req, res) => {
+    let { name, email, password } = req.body
+    try {
+        bcrypt.hash(password, 5, async (err, hash) => {
+            if (err) res.send({ "msg": "Something went Wrong", "err": err.message })
+            else {
+                let user = new userModel({ name, email, password: hash })
+                await user.save()
+                res.send({ "msg": "User Register Successfully" })
+            }
+        });
+    } catch (error) {
+        res.send({ "msg": "Something went Wrong", "err": error.message })
+    }
+
+})
+
+userRoute.post("/login", async (req, res) => {
+    const { email, password } = req.body
+    try {
+        let user = await userModel.find({ email })
+        console.log(user);
+        if (user.length > 0) {
+            bcrypt.compare(password, user[0].password, (err, result) => {
+                // result == true
+                if (result) res.send({ "msg": "User Login Successful", "token": token })
+                else {
+                    res.send({ "msg": "Wrong Credentials" })
+                }
+            })
+        } else {
+            res.send({ "msg": "Wrong Credentials" })
+        }
+    } catch (error) {
+        res.send({ "msg": "Something went Wrong", "err": error.message })
+    }
+
+})
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJpYXQiOjE2Nzk0MDUxMDN9.vCk8E05bjyE4X_NemDL3AEZ1nplB_USWEGM0cwZLYkY
